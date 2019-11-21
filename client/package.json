@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@johmun/vue-tags-input": "^2.1.0",
+    "@trevoreyre/autocomplete-vue": "^2.0.3",
     "axios": "^0.19.0",
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.1.0",

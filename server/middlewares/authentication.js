@@ -1,4 +1,5 @@
 const {sign, verify} = require('../helpers/jwt')
+const Question = require('../models/Question')
 
 function authentication(req, res, next){
   try{
@@ -12,6 +13,25 @@ function authentication(req, res, next){
   }
 }
 
+function authorization(req, res, next){
+  const _id = req.params.id
+  const loggedUser = req.loggedUser
+  Question.findOne({_id})
+    .then(question=>{
+      if(question._id == loggedUser._id){
+        next()
+      }
+      else{
+        next({
+          message: 'Not auhthorized',
+          status: 403
+        })
+      }
+    })
+    .catch(next)
+}
+
 module.exports = {
-  authentication
+  authentication,
+  authorization
 }

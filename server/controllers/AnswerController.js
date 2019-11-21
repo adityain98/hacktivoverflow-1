@@ -1,4 +1,5 @@
 const Answer = require('../models/Answer')
+const Question = require('../models/Question')
 
 class AnswerController {
   static addAnswer(req, res, next){
@@ -10,7 +11,14 @@ class AnswerController {
       author: loggedUser._id
     })
       .then(answer=>{
-        res.status(201).json(answer)
+        return Question.findOneAndUpdate({_id: question_id}, {
+          $push: {answers: answer._id}
+        }, {
+          new: true
+        })
+      })
+      .then(question=>{
+        res.status(201).json(question)
       })
       .catch(next)
   }

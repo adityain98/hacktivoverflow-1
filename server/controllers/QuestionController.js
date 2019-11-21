@@ -5,6 +5,8 @@ class QuestionController {
   static findAll(req, res, next){
     Question.find()
     .sort({createdAt:'desc'})
+    .populate('author')
+    .populate('tags')
       .then(questions=>{
         console.log(questions)
         res.status(200).json(questions)
@@ -16,7 +18,12 @@ class QuestionController {
     const _id = req.params.id
     Question.findOne({_id})
     .populate('author')
-    .populate('answers')
+    .populate({
+      path: 'answers',
+      populate: {
+        path: 'author'
+      }
+    })
     .populate('tags')
       .then(question=>{
         res.status(200).json(question)

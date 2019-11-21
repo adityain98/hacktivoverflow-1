@@ -9,6 +9,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     isLogin: '',
+    loggedUser: '',
+    tags: [],
     questions: [],
     question: {
       answers: [],
@@ -40,6 +42,12 @@ export default new Vuex.Store({
   mutations: {
     CHANGE_IS_LOGIN(state, payload){
       state.isLogin = payload
+    },
+    CHANGE_LOGGED_USER(state, payload){
+      state.loggedUser = payload
+    },
+    CHANGE_TAGS(state, payload){
+      state.tags = payload
     },
     CHANGE_LOGIN_EMAIL(state, payload){
       state.login.email = payload
@@ -94,6 +102,12 @@ export default new Vuex.Store({
           localStorage.setItem('token', data.token)
           localStorage.setItem('loggedUser', data._id)
           commit('CHANGE_IS_LOGIN', true)
+          commit('CHANGE_LOGIN_EMAIL', '')
+          commit('CHANGE_LOGIN_PASSWORD', '')
+          commit('CHANGE_REGISTER_EMAIL', '')
+          commit('CHANGE_REGISTER_PASSWORD', '')
+          commit('CHANGE_REGISTER_USERNAME', '')
+
           Swal.fire({
             icon:'success',
             title: 'Login success'
@@ -107,6 +121,16 @@ export default new Vuex.Store({
             title: `${err.response.data}`
           })
         })
+    },
+    logout({commit}){
+      localStorage.removeItem('token')
+      localStorage.removeItem('loggedUser')
+      commit('CHANGE_IS_LOGIN', false)
+      router.push('/login')
+      Swal.fire({
+        icon: 'success',
+        title: 'Logout success'
+      })
     },
     register({state, commit, dispatch}){
       const username = state.register.username
@@ -205,7 +229,7 @@ export default new Vuex.Store({
           })
         })
     },
-    addAnswer({state, dispatch}, payload){
+    addAnswer({state, commit ,dispatch}, payload){
       const description = state.addAnswer.description
       axiosCreate({
         url: '/answers',
@@ -220,10 +244,260 @@ export default new Vuex.Store({
       })
         .then(({ data })=>{
           console.log(data)
+          commit('ADD_ANSWER_DESCRIPTION', '')
+          dispatch('fetchOneQuestion', payload)
+          Swal.fire({
+            icon: 'success',
+            title: 'Success add answer'
+          })
+        })
+        .catch(({ response })=>{
+          console.log(response.data)
+          Swal.fire({
+            icon: 'error',
+            title: response.data
+          })
+        })
+    },
+    fetchLogin({commit}){
+      axiosCreate({
+        method: 'get',
+        url: '/users',
+        headers:{
+          access_token: localStorage.getItem('token')
+        }
+      })
+        .then(({ data })=>{
+          commit('CHANGE_IS_LOGIN', true)
+          commit('CHANGE_LOGGED_USER', data)
+        })
+        .catch(({ response })=>{
+          console.log(response.data)
+          Swal.fire({
+            icon: 'error',
+            title: response.data
+          })
+          localStorage.removeItem('token')
+          localStorage.removeItem('loggedUser')
+          commit('CHANGE_IS_LOGIN', false)
+          router.push('/login')
+        })
+    },
+    getTags({commit}){
+      axiosCreate({
+        url: '/tags',
+        method: 'get'
+      })
+        .then(({ data })=>{
+          console.log(data)
+          commit('CHANGE_TAGS', data)
+        })
+        .catch(({ response })=>{
+          Swal.fire({
+            icon: 'error',
+            title: response.data
+          })
+        })
+    },
+    questionUp({dispatch}, payload){
+      axiosCreate({
+        method: 'patch',
+        url: `/questions/up/add/${payload}`,
+        headers: {
+          access_token: localStorage.getItem('token')
+        }
+      })
+        .then(({ data })=>{
+          console.log(data)
           dispatch('fetchOneQuestion', payload)
         })
         .catch(({ response })=>{
           console.log(response.data)
+          Swal.fire({
+            icon: 'error',
+            title: response.data
+          })
+        })
+    },
+    questionUnup({dispatch}, payload){
+      axiosCreate({
+        method: 'patch',
+        url: `/questions/up/remove/${payload}`,
+        headers: {
+          access_token: localStorage.getItem('token')
+        }
+      })
+        .then(({ data })=>{
+          console.log(data)
+          dispatch('fetchOneQuestion', payload)
+        })
+        .catch(({ response })=>{
+          console.log(response.data)
+          Swal.fire({
+            icon: 'error',
+            title: response.data
+          })
+        })
+    },
+    questionDown({dispatch}, payload){
+      axiosCreate({
+        method: 'patch',
+        url: `/questions/down/add/${payload}`,
+        headers: {
+          access_token: localStorage.getItem('token')
+        }
+      })
+        .then(({ data })=>{
+          console.log(data)
+          dispatch('fetchOneQuestion', payload)
+        })
+        .catch(({ response })=>{
+          console.log(response.data)
+          Swal.fire({
+            icon: 'error',
+            title: response.data
+          })
+        })
+    },
+    questionUndown({dispatch}, payload){
+      axiosCreate({
+        method: 'patch',
+        url: `/questions/down/remove/${payload}`,
+        headers: {
+          access_token: localStorage.getItem('token')
+        }
+      })
+        .then(({ data })=>{
+          console.log(data)
+          dispatch('fetchOneQuestion', payload)
+        })
+        .catch(({ response })=>{
+          console.log(response.data)
+          Swal.fire({
+            icon: 'error',
+            title: response.data
+          })
+        })
+    },
+    answerUp({dispatch}, payload){
+      axiosCreate({
+        url: `/answers/up/add/${payload.answer_id}`,
+        method: 'patch',
+        headers: {
+          access_token: localStorage.getItem('token')
+        }
+      })
+      .then(({ data })=>{
+        console.log(data)
+        dispatch('fetchOneQuestion', payload.question_id)
+      })
+      .catch(({ response })=>{
+        console.log(response.data)
+        Swal.fire({
+          icon: 'error',
+          title: response.data
+        })
+      })
+    },
+    answerUnup({dispatch}, payload){
+      axiosCreate({
+        url: `/answers/up/remove/${payload.answer_id}`,
+        method: 'patch',
+        headers: {
+          access_token: localStorage.getItem('token')
+        }
+      })
+      .then(({ data })=>{
+        console.log(data)
+        dispatch('fetchOneQuestion', payload.question_id)
+      })
+      .catch(({ response })=>{
+        console.log(response.data)
+        Swal.fire({
+          icon: 'error',
+          title: response.data
+        })
+      })
+    },
+    answerDown({dispatch}, payload){
+      axiosCreate({
+        url: `/answers/down/add/${payload.answer_id}`,
+        method: 'patch',
+        headers: {
+          access_token: localStorage.getItem('token')
+        }
+      })
+      .then(({ data })=>{
+        console.log(data)
+        dispatch('fetchOneQuestion', payload.question_id)
+      })
+      .catch(({ response })=>{
+        console.log(response.data)
+        Swal.fire({
+          icon: 'error',
+          title: response.data
+        })
+      })
+    },
+    answerUndown({dispatch}, payload){
+      axiosCreate({
+        url: `/answers/down/remove/${payload.answer_id}`,
+        method: 'patch',
+        headers: {
+          access_token: localStorage.getItem('token')
+        }
+      })
+      .then(({ data })=>{
+        console.log(data)
+        dispatch('fetchOneQuestion', payload.question_id)
+      })
+      .catch(({ response })=>{
+        console.log(response.data)
+        Swal.fire({
+          icon: 'error',
+          title: response.data
+        })
+      })
+    },
+    addTag({dispatch}, payload){
+      axiosCreate({
+        url: '/users/tag',
+        method: 'patch',
+        data: {
+          tag: payload
+        },
+        headers: {
+          access_token: localStorage.getItem('token')
+        }
+      })
+        .then(({ data })=>{
+          console.log(data)
+          dispatch('fetchLogin')
+        })
+        .catch(({ response })=>{
+          console.log(response)
+          Swal.fire({
+            icon: 'error',
+            title: response.data
+          })
+        })
+    },
+    removeTag({dispatch}, payload){
+      axiosCreate({
+        url: '/users/tag/delete',
+        method: 'patch',
+        data: {
+          tag: payload
+        },
+        headers: {
+          access_token: localStorage.getItem('token')
+        }
+      })
+        .then(({ data })=>{
+          dispatch('fetchLogin')
+        })
+        .catch(({ response })=>{
+          console.log(response)
           Swal.fire({
             icon: 'error',
             title: response.data

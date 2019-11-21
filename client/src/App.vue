@@ -15,6 +15,11 @@ export default {
   components: {
     Navbar,
     Footer
+  },
+  created(){
+    if(localStorage.getItem('token')){
+      this.$store.dispatch('fetchLogin')
+    }
   }
 }
 </script>

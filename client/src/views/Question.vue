@@ -21,11 +21,11 @@
         </div>
         <div class="d-flex">
           <div class="d-flex flex-column align-items-center pt-4">
-            <img src="../assets/up.png" style="width:40px" class="icons" v-if="!isUpvote">
-            <img src="../assets/up2.png" style="width:40px" class="icons" v-else>
+            <img src="../assets/up.png" style="width:40px" class="icons" v-if="!isUpvote" @click.prevent="questionUp()">
+            <img src="../assets/up2.png" style="width:40px" class="icons" v-else @click.prevent="questionUnup()">
             <h4 class="m-0">{{ question.upVotes.length - question.downVotes.length }}</h4>
-            <img src="../assets/down.png" style="width:40px" class="icons" v-if="!isDownvote">
-            <img src="../assets/down2.png" style="width:40px" class="icons" v-else>
+            <img src="../assets/down.png" style="width:40px" class="icons" v-if="!isDownvote" @click.prevent="questionDown()">
+            <img src="../assets/down2.png" style="width:40px" class="icons" v-else @click.prevent="questionUndown()">
           </div>
           <div class="ml-3 pt-4">
             <div v-html="question.description"></div>
@@ -47,8 +47,8 @@
         </div>
         <hr>
         <!-- loop answer -->
-        <Answer v-for="answer in question.answers" :key="answer._id"/>
-        <div class="mb-3">
+        <Answer v-for="answer in question.answers" :key="answer._id" :answer="answer"/>
+        <div class="mb-3" v-if="isLogin">
           <h4>Your Answer</h4>
           <VueEditor v-model="description"/>
           <hr>
@@ -123,6 +123,9 @@ export default {
       set(value){
         this.$store.commit('ADD_ANSWER_DESCRIPTION', value)
       }
+    },
+    isLogin(){
+      return this.$store.state.isLogin
     }
   },
   created(){
@@ -138,7 +141,19 @@ export default {
     addAnswer(){
       const id = this.$route.params.id
       this.$store.dispatch('addAnswer', id)
-    }
+    },
+    questionUp(){
+      this.$store.dispatch('questionUp', this.$route.params.id)
+    },
+    questionUnup(){
+      this.$store.dispatch('questionUnup', this.$route.params.id)
+    },
+    questionDown(){
+      this.$store.dispatch('questionDown', this.$route.params.id)
+    },
+    questionUndown(){
+      this.$store.dispatch('questionUndown', this.$route.params.id)
+    },
   }
 }
 </script>

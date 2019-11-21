@@ -18,7 +18,7 @@
         </form>
       </div>
       <div class="d-flex">
-        <div v-if="isLogin">
+        <div v-if="isLogin" @click.prevent="logout()" style="cursor: pointer">
           Logout
         </div>
         <div v-else @click.prevent="toLogin()" style="cursor: pointer">
@@ -42,6 +42,9 @@ export default {
     },
     toLogin(){
       this.$router.push('/login')
+    },
+    logout(){
+      this.$store.dispatch('logout')
     }
   }
 }

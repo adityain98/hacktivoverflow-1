@@ -65,6 +65,39 @@ class UserController {
       })
       .catch(next)
   }
+
+  static removeTag(req, res, next){
+    const {tag} = req.body
+    const loggedUser = req.loggedUser
+    Tag.findOne({tag})
+      .then(tag=>{
+        if(tag){
+          return User.findOneAndUpdate({_id: loggedUser._id}, {
+            $pull: {tags: tag._id}
+          })
+        }
+        else{
+          next({
+            status: 400,
+            message: 'Tag not found'
+          })
+        }
+      })
+      .then(user=>{
+        res.status(200).json(user)
+      })
+      .catch(next)
+  }
+
+  static getUser(req, res, next){
+    const loggedUser = req.loggedUser
+    User.findOne({_id: loggedUser._id})
+    .populate('tags')
+      .then(user=>{
+        res.status(200).json(user)
+      })
+      .catch(next)
+  }
 }
 
 module.exports = UserController

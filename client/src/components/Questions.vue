@@ -16,12 +16,12 @@
         <small class="mb-2" v-html="tinyDesc"></small>
         <div class="d-flex justify-content-between mb-2">
           <div style="width: 80%">
-            <button class="btn btn-sm tag-button mr-1 mb-1">Javascript</button>
+            <button class="btn btn-sm tag-button mr-1 mb-1" v-for="tag in question.tags" :key="tag._id">{{ tag.tag }}</button>
           </div>
           <div class="d-flex justify-content-end">
             <div class="d-flex flex-column">
               <small>{{ moment }}</small>
-              <small>Author: Indra</small>
+              <small>Author: {{ question.author.username }}</small>
             </div>
           </div>
         </div>
