@@ -18,7 +18,8 @@ function authorization(req, res, next){
   const loggedUser = req.loggedUser
   Question.findOne({_id})
     .then(question=>{
-      if(question._id == loggedUser._id){
+      console.log()
+      if(question.author == loggedUser._id){
         next()
       }
       else{

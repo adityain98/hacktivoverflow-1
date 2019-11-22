@@ -7,7 +7,15 @@
         <div class="d-flex flex-column container border-bottom pt-2 pb-2">
           <div class="d-flex justify-content-between align-items-center" style="width: 100%">
             <div class="title">
-              <strong>All Question</strong>
+              <strong v-if="!searchQuestion">
+                <div v-if="!tag">
+                  All Question
+                </div>
+                <div v-else>
+                  Tags: {{tag}}
+                </div>
+              </strong>
+              <strong v-else>{{ searchQuestion }}</strong>
             </div>
             <div>
               <button class="btn btn-primary rounded-sm" style="font-size: 90%">
@@ -39,7 +47,7 @@
           <div class="card-body">
             <div class="d-flex flex-wrap">
               <div v-if="!isEdit">
-                <button class="btn btn-sm tag-button m-1" v-for="tag in loggedUser.tags" :key="tag._id">{{ tag.tag }}</button>
+                <button class="btn btn-sm tag-button m-1" v-for="tag in loggedUser.tags" :key="tag._id" @click.prevent="tagSearch(tag.tag)">{{ tag.tag }}</button>
               </div>
               <div v-else>
                 <span class="btn btn-sm tag-button m-1" v-for="tag in loggedUser.tags" :key="tag._id">
@@ -90,6 +98,9 @@ export default {
     Autocomplete
   },
   created(){
+    if(localStorage.getItem('token')){
+      this.$store.dispatch('fetchLogin')
+    }
     this.$store.dispatch('fetchQuestions')
     this.$store.dispatch('getTags')
   },
@@ -120,6 +131,9 @@ export default {
     },
     removeTag(tag){
       this.$store.dispatch('removeTag', tag)
+    },
+    tagSearch(tag){
+      this.$store.dispatch('tagSearch', tag)
     }
   },
   computed: {
@@ -138,6 +152,12 @@ export default {
     },
     loggedUser(){
       return this.$store.state.loggedUser
+    },
+    searchQuestion(){
+      return this.$store.state.search
+    },
+    tag(){
+      return this.$store.state.tag
     }
   }
 }

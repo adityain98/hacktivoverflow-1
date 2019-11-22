@@ -33,8 +33,9 @@ class QuestionController {
 
   static deleteQuestion(req, res, next){
     const _id = req.params.id
+    console.log()
     Tag.findOneAndUpdate({questions: _id}, {
-      questions: {$pull: _id}
+      $pull: {questions: _id}
     })
       .then(tag=>{
         return Question.findOneAndDelete({_id})
@@ -68,6 +69,9 @@ class QuestionController {
     Question.find({
       title: {$regex: search}
     })
+    .sort({createdAt:'desc'})
+    .populate('author')
+    .populate('tags')
       .then(questions=>{
         res.status(200).json(questions)
       })
@@ -113,6 +117,9 @@ class QuestionController {
     Tag.findOne({tag})
       .then(tag=>{
         return Question.find({tags: tag._id})
+        .sort({createdAt:'desc'})
+        .populate('author')
+        .populate('tags')
       })
       .then(questions=>{
         res.status(200).json(questions)

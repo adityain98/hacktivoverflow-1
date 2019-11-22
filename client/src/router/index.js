@@ -18,7 +18,17 @@ const routes = [
   {
     path: '/ask',
     name: 'ask',
-    component: () => import(/* webpackChunkName: "askQuestion" */ '../views/AskQuestion.vue')
+    component: () => import(/* webpackChunkName: "askQuestion" */ '../views/AskQuestion.vue'),
+    beforeEnter: (to, from, next) => {
+      if(localStorage.getItem('token')){
+        console.log(localStorage.getItem('token'))
+        next()
+      }
+      else{
+        console.log(localStorage.getItem('token'))
+        next('/login')
+      }
+    }
   },
   {
     path: '/login',

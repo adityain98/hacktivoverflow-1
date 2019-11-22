@@ -3,10 +3,10 @@ const QuestionController = require('../controllers/QuestionController')
 const {authentication, authorization} = require('../middlewares/authentication')
 
 router.get('/', QuestionController.findAll)
-router.get('/search', QuestionController.searchQuestion)
-router.get('/tag', QuestionController.tagSearch)
 router.get('/:id', QuestionController.findOne)
 
+router.post('/tag', QuestionController.tagSearch)
+router.post('/search', QuestionController.searchQuestion)
 router.use(authentication)
 
 router.post('/', QuestionController.addQuestion)

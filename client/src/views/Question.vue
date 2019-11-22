@@ -5,7 +5,7 @@
       </div>
       <div class="col-sm border-left p-0 pr-2 pl-4">
         <div class="d-flex flex-column border-bottom pt-2 pb-2">
-          <div class="d-flex justify-content-between" style="width: 100%">
+          <div class="d-flex mt-2 justify-content-between" style="width: 100%">
             <div class="title" style="width: 80%">
               <strong>{{ question.title }}</strong>
             </div>

@@ -13,8 +13,8 @@
         </div>
       </div>
       <div style="height: 100%; width:60%" class="d-flex flex-column justify-content-center">
-        <form class="form-group p-0 m-0">
-          <input type="text" class="form-control form-control-sm" placeholder="🔍 Search...">
+        <form class="form-group p-0 m-0" @submit.prevent="enterSearch()">
+          <input type="text" class="form-control form-control-sm" placeholder="🔍 Search..." v-model="search">
         </form>
       </div>
       <div class="d-flex">
@@ -34,10 +34,19 @@ export default {
   computed: {
     isLogin(){
       return this.$store.state.isLogin
+    },
+    search: {
+      get(){
+        return this.$store.state.search
+      },
+      set(value){
+        this.$store.commit('CHANGE_SEARCH', value)
+      }
     }
   },
   methods: {
     toHome(){
+      this.$store.dispatch('fetchQuestions')
       this.$router.push('/')
     },
     toLogin(){
@@ -45,6 +54,19 @@ export default {
     },
     logout(){
       this.$store.dispatch('logout')
+    },
+    enterSearch(){
+      console.log(this.search)
+    }
+  },
+  watch: {
+    search(){
+      if(this.search){
+        this.$store.dispatch('fetchSearch')
+      }
+      else{
+        this.$store.dispatch('fetchQuestions')
+      }
     }
   }
 }

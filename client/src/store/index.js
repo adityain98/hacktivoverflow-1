@@ -11,7 +11,9 @@ export default new Vuex.Store({
     isLogin: '',
     loggedUser: '',
     tags: [],
+    tag: '',
     questions: [],
+    search: '',
     question: {
       answers: [],
       upVotes: [],
@@ -46,8 +48,14 @@ export default new Vuex.Store({
     CHANGE_LOGGED_USER(state, payload){
       state.loggedUser = payload
     },
+    CHANGE_SEARCH(state, payload){
+      state.search = payload
+    },
     CHANGE_TAGS(state, payload){
       state.tags = payload
+    },
+    CHANGE_TAG(state, payload){
+      state.tag = payload
     },
     CHANGE_LOGIN_EMAIL(state, payload){
       state.login.email = payload
@@ -164,6 +172,8 @@ export default new Vuex.Store({
         url: '/questions/'
       })
         .then(({ data })=>{
+          console.log(1234)
+          commit('CHANGE_TAG', '')
           commit('CHANGE_QUESTIONS', data)
         })
         .catch(({response})=>{
@@ -185,6 +195,45 @@ export default new Vuex.Store({
           Swal.fire({
             icon: 'error',
             title: `${response.data}`
+          })
+        })
+    },
+    fetchSearch({state, commit}){
+      axiosCreate({
+        url: '/questions/search',
+        method: 'post',
+        data: {
+          search: state.search
+        }
+      })
+        .then(({ data })=>{
+          console.log(data)
+          commit('CHANGE_QUESTIONS', data)
+        })
+        .catch(({ response })=>{
+          console.log(response.data)
+        })
+      
+    },
+    tagSearch({state, commit}, payload){
+      commit('CHANGE_TAG', payload)
+      axiosCreate({
+        url: '/questions/tag',
+        method: 'post',
+        data: {
+          tag: state.tag
+        }
+      })
+        .then(({ data })=>{
+          console.log(data)
+          router.push('/')
+          commit('CHANGE_QUESTIONS', data)
+        })
+        .catch(({ response })=>{
+          console.log(response.data)
+          Swal.fire({
+            icon: 'error',
+            title: response.data
           })
         })
     },
@@ -228,6 +277,26 @@ export default new Vuex.Store({
             title: `${response.data}`
           })
         })
+    },
+    deleteQuestion({dispatch}, payload){
+      axiosCreate({
+        url: `/questions/${payload}`,
+        method: 'delete',
+        headers: {
+          access_token: localStorage.getItem('token')
+        }
+      })
+        .then(({ data })=>{
+          console.log(data)
+          dispatch('fetchQuestions')
+        })
+          .catch(({ response })=>{
+            console.log(response.data)
+            Swal.fire({
+              icon: 'error',
+              title: response.data
+            })
+          })
     },
     addAnswer({state, commit ,dispatch}, payload){
       const description = state.addAnswer.description
